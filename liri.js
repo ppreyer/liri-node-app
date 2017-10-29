@@ -32,15 +32,22 @@ var twitterObject = {
             if (error) {
                 throw error;
             } else {
+                var logResults = '';
                 for (var i = 0; i < tweets.length; i++) {
-                    console.log(
-                        "@" + tweets[i].user.screen_name + ":" +
+                    logResults += "@" + tweets[i].user.screen_name + ":" +
                         " " +
                         tweets[i].text +
                         " Tweeted at: " +
-                        tweets[i].created_at
-                    );
+                        tweets[i].created_at;
                 }
+                console.log(logResults);
+                fs.appendFile("log.txt", logResults, function(err) {
+                  if(err) {
+                    console.log(err);
+                  } else {
+                    console.log("Content Added!");
+                  }
+                })
             }
         })
 
@@ -66,10 +73,23 @@ var spotifyObject = {
         return console.log('Error occurred: ' + err);
       } else {
         var songInfo = data.tracks.items[0];
-        console.log("Artist: " + songInfo.artists[0].name);
-        console.log("Song Title: " + songInfo.name);
-        console.log("Album Name: " + songInfo.album.name);
-        console.log("Spotify URL: " + songInfo.preview_url);
+        var songResults = "Artist: " + songInfo.artists[0].name +
+                          "Song Title: " + songInfo.name +
+                          "Album Name: " + songInfo.album.name +
+                          "Spotify URL: " + songInfo.preview_url
+        // console.log("Artist: " + songInfo.artists[0].name);
+        // console.log("Song Title: " + songInfo.name);
+        // console.log("Album Name: " + songInfo.album.name);
+        // console.log("Spotify URL: " + songInfo.preview_url);
+        console.log(songResults);
+        fs.appendFile("log.txt", songResults, function(err) {
+                  if(err) {
+                    console.log(err);
+                  } else {
+                    console.log("Content Added!");
+                  }
+                })
+
         }
       })
   }
@@ -98,15 +118,30 @@ var movieObject = {
 
   // If the request is successful
   if (!error && response.statusCode === 200) {
-    console.log("Title: " + JSON.parse(body).Title);
-    console.log("Release Year: " + JSON.parse(body).Year);
-    console.log("IMBD Rating: " + JSON.parse(body).imdbRating);
-    console.log("Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[0].Value);
-    console.log("Production Country: " + JSON.parse(body).Country);
-    console.log("Languages: " + JSON.parse(body).Language);
-    console.log("Plot: " + JSON.parse(body).Plot);
-    console.log("Actors: " + JSON.parse(body).Actors);
-
+    var movieResults = "Title: " + JSON.parse(body).Title +
+                        "Release Year: " + JSON.parse(body).Year +
+                        "IMBD Rating: " + JSON.parse(body).imdbRating +
+                        "Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[0].Value +
+                        "Production Country: " + JSON.parse(body).Country +
+                        "Languages: " + JSON.parse(body).Language +
+                        "Plot: " + JSON.parse(body).Plot +
+                        "Actors: " + JSON.parse(body).Actors
+    // console.log("Title: " + JSON.parse(body).Title);
+    // console.log("Release Year: " + JSON.parse(body).Year);
+    // console.log("IMBD Rating: " + JSON.parse(body).imdbRating);
+    // console.log("Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[0].Value);
+    // console.log("Production Country: " + JSON.parse(body).Country);
+    // console.log("Languages: " + JSON.parse(body).Language);
+    // console.log("Plot: " + JSON.parse(body).Plot);
+    // console.log("Actors: " + JSON.parse(body).Actors);
+    console.log(movieResults);
+    fs.appendFile("log.txt", movieResults, function(err) {
+                  if(err) {
+                    console.log(err);
+                  } else {
+                    console.log("Content Added!");
+                  }
+                })
   }
 });
   }
@@ -147,6 +182,7 @@ switch (liriArgument) {
     case "movie-this":
         var try1 = movieObject.determineMovieName();
         movieObject.requestMovie(try1);
+        break;
     case "do-what-it-says":
         readRandomFileContent();
 } 
