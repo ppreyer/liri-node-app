@@ -1,10 +1,3 @@
-// At the top of the liri.js file, write the code you need to grab the data from keys.js. Then store the keys in a variable.
-// Make it so liri.js can take in one of the following commands:
-// my-tweets
-// spotify-this-song
-// movie-this
-// do-what-it-says
-
 var Twitter = require('twitter');
 var twitterKeys = require('./keys.js');
 var twitterKeys = new Twitter ({
@@ -19,6 +12,7 @@ var spotify = new Spotify({
   secret: 'a704a02d53a34127acfb48b3980280b9'
 });
 var request = require('request');
+var fs = require('fs');
 var liriArgument = process.argv[2];
 
 // my-tweets
@@ -57,10 +51,14 @@ var spotifyObject = {
     song: "",
     args: process.argv,
     determineSongName: function() {
-      for (var i = 3; i < this.args.length; i++) {
-        var songWord = this.args[i];
-        this.song += songWord + " ";
-      }
+      if(this.args.length < 4) {
+        this.song = "Forgot About Dre";
+      } else {
+          for (var i = 3; i < this.args.length; i++) {
+          var songWord = this.args[i];
+          this.song += songWord + " ";
+          }
+        }
     },
     searchSpotifySong: function() {
       spotify.search({ type: 'track', query: this.song}, function(err, data) {
@@ -81,7 +79,7 @@ var movieObject = {
   movieName: "",
   args: process.argv,
   determineMovieName: function() {
-  if(this.args.length < 3) {
+  if(this.args.length < 4) {
     this.movieName = "Mr. Nobody";
   } else {
       for (var i = 3; i < this.args.length; i++) {
@@ -89,11 +87,14 @@ var movieObject = {
         this.movieName += movieWord + " ";
       }
     }
+    console.log(this.movieName);
+    return this.movieName;
   },
   queryUrl: "http://www.omdbapi.com/?t=" + this.movieName + "&y=&plot=short&apikey=40e9cece",
-  requestMovie: function() {
-    request(this.queryUrl, function(error, response, body) {
-    console.log(this.queryUrl);
+  requestMovie: function(movieNamePassed) {
+    var queryGo2 = "http://www.omdbapi.com/?t=" + movieNamePassed + "&y=&plot=short&apikey=40e9cece";
+    request(queryGo2, function(error, response, body) {
+
 
   // If the request is successful
   if (!error && response.statusCode === 200) {
@@ -104,7 +105,7 @@ var movieObject = {
     console.log("Production Country: " + JSON.parse(body).Country);
     console.log("Languages: " + JSON.parse(body).Language);
     console.log("Plot: " + JSON.parse(body).Plot);
-    console.log("Actors: " + JSON.parse(body).Actors); 
+    console.log("Actors: " + JSON.parse(body).Actors);
 
   }
 });
@@ -112,8 +113,30 @@ var movieObject = {
 
 }
 
+function readRandomFileContent() {
+    fs.readFile("random.txt", "utf8", function(error, song) {
+      if (error) {
+        return console.log(error);
+      } else {
+        var songArr = song.split(",");
+        var songSearch = songArr[1];
+      }
+      spotify.search({ type: 'track', query: songSearch}, function(err, data) {
+      if (err) {
+        return console.log('Error occurred: ' + err);
+      } else {
+        var songInfo = data.tracks.items[0];
+        console.log("Artist: " + songInfo.artists[0].name);
+        console.log("Song Title: " + songInfo.name);
+        console.log("Album Name: " + songInfo.album.name);
+        console.log("Spotify URL: " + songInfo.preview_url);
+        }
+      })
+    })
+}
+
 switch (liriArgument) {
-    case "my-tweets":  
+    case "my-tweets":
         twitterObject.determineScreenName();
         twitterObject.findTweets();
         break;
@@ -122,26 +145,15 @@ switch (liriArgument) {
         spotifyObject.searchSpotifySong();
         break;
     case "movie-this":
-        movieObject.determineMovieName();
-        movieObject.requestMovie();
-}
+        var try1 = movieObject.determineMovieName();
+        movieObject.requestMovie(try1);
+    case "do-what-it-says":
+        readRandomFileContent();
+} 
 
 
 
-// var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=40e9cece";
 
-// request(queryUrl, function(error, response, body) {
 
-//   // If the request is successful
-//   if (!error && response.statusCode === 200) {
-//     console.log("Title: " + JSON.parse(body).Title);
-//     console.log("Release Year: " + JSON.parse(body).Year);
-//     console.log("IMBD Rating: " + JSON.parse(body).imdbRating);
-//     console.log("Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[0].Value);
-//     console.log("Production Country: " + JSON.parse(body).Country);
-//     console.log("Languages: " + JSON.parse(body).Language);
-//     console.log("Plot: " + JSON.parse(body).Plot);
-//     console.log("Actors: " + JSON.parse(body).Actors); 
 
-//   }
-// });
+
