@@ -15,11 +15,6 @@ var request = require('request');
 var fs = require('fs');
 var liriArgument = process.argv[2];
 
-// my-tweets
-// spotify-this-song
-// movie-this
-// do-what-it-says
-
 var twitterObject = {
     handle: process.argv[3],
     determineScreenName: function() {
@@ -185,6 +180,14 @@ switch (liriArgument) {
         break;
     case "do-what-it-says":
         readRandomFileContent();
+    default : 
+        console.log("Try typing one of the following commands after 'node liri.js':" + "\r\n" +
+                    "1. my-tweets 'any twitter handle' " + "\r\n" +
+                    "2. spotify-this-song 'any song title' "+"\r\n" +
+                    "3. movie-this 'any movie title' "+"\r\n" +
+                    "4. do-what-it-says."+"\r\n"
+          );
+        break;
 } 
 
 
